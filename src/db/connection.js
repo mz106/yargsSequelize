@@ -13,10 +13,12 @@ const connection = new Sequelize(
     }
 );
 
-// connection.authenticate().then(() =>{
-//     console.log(" connection established");
-// }).catch((err) => {
-//     console.log(err)
-// });
+// const connection = new Sequelize(process.env.DB_URI);
+
+// clever cloud connection
+// const connection = new Sequelize(process.env.CC_DB_CONNECTION);
+
+
 
 module.exports = connection;
+

@@ -1,25 +1,39 @@
 require("dotenv").config();
-const yargs = require("yargs");
+const yargs = require("yargs/yargs");
+const { hideBin } = require("yargs/helpers");
+const argv = yargs(hideBin(process.argv)).argv;
+console.log(argv);
 const { Sequelize } = require("sequelize");
 
-const { addMovie, listMovies } = require('./utils/index');
+const { addMovie, listMovies, updateMovie, deleteMovie } = require('./utils/index');
 const { Movie } = require("./models/models");
 const connection = require("./db/connection");
 
-const command = yargs.argv._[0];
-console.log(command)
-const app = async (yargsObj, command) => {
+
+const app = async (commandLineInput) => {
     connection.authenticate()
     try {
-        if (yargs.argv._[0] === 'add') {
+        if (commandLineInput.add) {
             await Movie.sync({alter: true});
-            const movie = await addMovie({title: yargsObj.title, actor: yargsObj.actor});
-        } else if (yargs.argv._[0] === 'list') {
-            await listMovies({title: yargsObj.title});
+            const movie = await addMovie({title: commandLineInput.title, actor: commandLineInput.actor, rating: commandLineInput.rating});
+        } else if (commandLineInput.list) {
+            await listMovies();
+        } else if (commandLineInput.update) {
+            await updateMovie({title: commandLineInput.actor}, {
+                where: {
+                    title: commandLineInput.title
+                }
+            });
+        } else if (commandLineInput.delete) {
+            await deleteMovie({where: {title: commandLineInput.title}});
         }
+
+        await connection.close();
+        process.exit();
+
     } catch (error) {
         console.log(error);
     }
 }; 
 
-app(yargs.argv);
+app(argv);
